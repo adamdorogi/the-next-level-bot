@@ -12,6 +12,11 @@ const reminders: Record<string, GuildScheduledEventReminder | undefined> = {};
 const getEventChannel = async (scheduledEvent: GuildScheduledEvent) => {
     const channelName = scheduledEvent.entityMetadata.location?.replace(/#/, '').trim().toLowerCase();
     const guild = await scheduledEvent.client.guilds.fetch(scheduledEvent.guildId);
+    const activeThreads = await guild.channels.fetchActiveThreads();
+    var thread = activeThreads.threads.find(t => t.name === channelName);
+    if (thread) {
+        return thread;
+    }
     const channels = await guild.channels.fetch();
     return channels.find(c => c.name === channelName);
 }
@@ -58,7 +63,7 @@ ${mentions}`
 
 const remindInChannel = async (scheduledEvent: GuildScheduledEvent) => {
     const channel = await getEventChannel(scheduledEvent);
-    if (!channel || !channel.isText()) {
+    if (!channel || !(channel.isText() || channel.isThread())) {
         return;
     }
 
@@ -130,7 +135,7 @@ export const onGuildScheduledEventUserAdd = async (scheduledEvent: GuildSchedule
         return;
     }
     const eventChannel = await getEventChannel(scheduledEvent);
-    if (!eventChannel || !eventChannel.isText()) {
+    if (!eventChannel || !(eventChannel.isText() || eventChannel.isThread())) {
         return;
     }
     const guild = await scheduledEvent.client.guilds.fetch(scheduledEvent.guildId);
@@ -158,7 +163,7 @@ export const onGuildScheduledEventUserRemove = async (scheduledEvent: GuildSched
     const guild = await scheduledEvent.client.guilds.fetch(scheduledEvent.guildId);
 
     const eventChannel = await getEventChannel(scheduledEvent);
-    if (eventChannel && eventChannel.isText()) {
+    if (eventChannel && (eventChannel.isText() || eventChannel.isThread())) {
         const member = await guild.members.fetch(user);
         if (!member) {
             return;
