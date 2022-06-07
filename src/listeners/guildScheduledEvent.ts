@@ -118,6 +118,10 @@ export const onGuildScheduledEvent = async (scheduledEvent: GuildScheduledEvent)
     }
 }
 
+export const onGuildScheduledEventDelete = async (scheduledEvent: GuildScheduledEvent) => {
+    removeReminder(scheduledEvent.id);
+}
+
 export const onGuildScheduledEventUpdate = async (_: GuildScheduledEvent, newScheduledEvent: GuildScheduledEvent) => onGuildScheduledEvent(newScheduledEvent);
 
 export const onGuildScheduledEventUserAdd = async (scheduledEvent: GuildScheduledEvent, user: User) => {

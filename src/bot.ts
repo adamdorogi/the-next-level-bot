@@ -1,7 +1,7 @@
 import 'dotenv/config'
 import { Client, Constants } from "discord.js";
 // import fs from "fs";
-import { onGuildScheduledEvent, onGuildScheduledEventUpdate, onGuildScheduledEventUserAdd, onGuildScheduledEventUserRemove } from './listeners/guildScheduledEvent';
+import { onGuildScheduledEvent, onGuildScheduledEventDelete, onGuildScheduledEventUpdate, onGuildScheduledEventUserAdd, onGuildScheduledEventUserRemove } from './listeners/guildScheduledEvent';
 // import { interactionCreate } from './listeners/interaction';
 import { onReady } from './listeners/ready';
 import { onGuildCreate } from './listeners/guild';
@@ -24,7 +24,7 @@ client.on(Constants.Events.CLIENT_READY, onReady);
 client.on(Constants.Events.GUILD_CREATE, onGuildCreate);
 // client.on(Constants.Events.INTERACTION_CREATE, interactionCreate)
 client.on(Constants.Events.GUILD_SCHEDULED_EVENT_CREATE, onGuildScheduledEvent);
-client.on(Constants.Events.GUILD_SCHEDULED_EVENT_DELETE, onGuildScheduledEvent);
+client.on(Constants.Events.GUILD_SCHEDULED_EVENT_DELETE, onGuildScheduledEventDelete);
 client.on(Constants.Events.GUILD_SCHEDULED_EVENT_UPDATE, onGuildScheduledEventUpdate);
 client.on(Constants.Events.GUILD_SCHEDULED_EVENT_USER_ADD, onGuildScheduledEventUserAdd);
 client.on(Constants.Events.GUILD_SCHEDULED_EVENT_USER_REMOVE, onGuildScheduledEventUserRemove);
