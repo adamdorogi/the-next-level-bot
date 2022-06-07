@@ -10,7 +10,7 @@ type GuildScheduledEventReminder = {
 const reminders: Record<string, GuildScheduledEventReminder | undefined> = {};
 
 const getEventChannel = async (scheduledEvent: GuildScheduledEvent) => {
-    const channelName = scheduledEvent.entityMetadata.location?.replace(/#/, '');
+    const channelName = scheduledEvent.entityMetadata.location?.replace(/#/, '').trim();
     const guild = await scheduledEvent.client.guilds.fetch(scheduledEvent.guildId);
     const channels = await guild.channels.fetch();
     return channels.find(c => c.name === channelName);
