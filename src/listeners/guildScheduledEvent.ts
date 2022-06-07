@@ -23,7 +23,7 @@ const getEventChannel = async (scheduledEvent: GuildScheduledEvent) => {
 
 const remindInDM = async (scheduledEvent: GuildScheduledEvent) => {
     const subscribers = await scheduledEvent.fetchSubscribers({ withMember: true });
-    const mentions = subscribers.map(subscriber => `${subscriber.member.displayName}`).join('\n');
+    const mentions = subscribers.map(subscriber => `${subscriber.member?.displayName || subscriber.user.username}`).join('\n');
 
     const channel = await getEventChannel(scheduledEvent);
     const location = channel ? `${channel}` : scheduledEvent.entityMetadata.location;
