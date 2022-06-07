@@ -1,0 +1,6 @@
+services:
+  kryten:
+    build: .
+    container_name: kryten
+    env_file:
+    - .env
