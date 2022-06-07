@@ -13,7 +13,7 @@ const getEventChannel = async (scheduledEvent: GuildScheduledEvent) => {
     const channelName = scheduledEvent.entityMetadata.location?.replace(/#/, '').trim().toLowerCase();
     const guild = await scheduledEvent.client.guilds.fetch(scheduledEvent.guildId);
     const activeThreads = await guild.channels.fetchActiveThreads();
-    var thread = activeThreads.threads.find(t => t.name === channelName);
+    var thread = activeThreads.threads.find(t => t.name.toLowerCase() === channelName);
     if (thread) {
         return thread;
     }
