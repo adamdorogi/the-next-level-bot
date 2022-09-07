@@ -33,7 +33,7 @@ Event Reminder:
 This is a reminder for the **${scheduledEvent.name}** event that starts in 1 hour and 30 minutes. Please get ready and be on time for the session. Once you the ready, join the applicable voice channel to let others know that you are ready.
 
 If you expect to be late, please inform how late you will be. Or if you expect to be absent, please remove your name from the event within the next 30 minutes and inform in the ${location} channel.
-Removing your name within the hour before start of the session, failing to inform of any lateness or absenteeism may result in a warning. Please read our <#934632329421398026>, specifically rules 11.0, 11.1, and 11.2.
+Removing your name within the hour before start of the session, failing to inform of any lateness or absenteeism may result in a warning. Please read our <#934632329421398026>, specifically rule 11.
 
 If you require any assistance, please head over to the <#874388042205499422> channel and ask for it. Tagging one of the online staff members will get you a faster response.
 
@@ -71,7 +71,7 @@ const remindInChannel = async (scheduledEvent: GuildScheduledEvent) => {
     const mentions = subscribers.map(subscriber => `${subscriber.user}`).join('\n');
 
     const message = `
-Your event will start in 10 minutes. Please join the applicable VC now to get started.
+Your event will start in 10 minutes. Please join the applicable VC now to get started. Typically the voice channel is created by the host, so look for a VC with the host's name. Or create one of your own by pressing <#964545089852543046>. If you need assistance, ask in the <#874388042205499422> channel.
 
 ${mentions}`
 
