@@ -1,6 +1,6 @@
 import 'dotenv/config'
 import { Client, Constants } from "discord.js";
-import { onGuildScheduledEvent, onGuildScheduledEventDelete, onGuildScheduledEventUpdate, onGuildScheduledEventUserAdd, onGuildScheduledEventUserRemove } from './listeners/guildScheduledEvent';
+import { onGuildScheduledEventCreate, onGuildScheduledEventDelete, onGuildScheduledEventUpdate, onGuildScheduledEventUserAdd, onGuildScheduledEventUserRemove } from './listeners/guildScheduledEvent';
 import { onReady } from './listeners/ready';
 
 const client = new Client({
@@ -11,7 +11,7 @@ client.on(Constants.Events.DEBUG, async (info: string) => console.log(info));
 client.on(Constants.Events.ERROR, async (error: Error) => console.error(error));
 
 client.on(Constants.Events.CLIENT_READY, onReady);
-client.on(Constants.Events.GUILD_SCHEDULED_EVENT_CREATE, onGuildScheduledEvent);
+client.on(Constants.Events.GUILD_SCHEDULED_EVENT_CREATE, onGuildScheduledEventCreate);
 client.on(Constants.Events.GUILD_SCHEDULED_EVENT_DELETE, onGuildScheduledEventDelete);
 client.on(Constants.Events.GUILD_SCHEDULED_EVENT_UPDATE, onGuildScheduledEventUpdate);
 client.on(Constants.Events.GUILD_SCHEDULED_EVENT_USER_ADD, onGuildScheduledEventUserAdd);

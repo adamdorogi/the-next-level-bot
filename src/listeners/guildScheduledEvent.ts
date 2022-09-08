@@ -9,6 +9,8 @@ type GuildScheduledEventReminder = {
 
 const reminders: Record<string, GuildScheduledEventReminder | undefined> = {};
 
+const pings: Record<string, NodeJS.Timeout | undefined> = {};
+
 const getEventChannel = async (scheduledEvent: GuildScheduledEvent) => {
     const channelName = scheduledEvent.entityMetadata.location?.replace(/#/, '').trim().toLowerCase();
     const guild = await scheduledEvent.client.guilds.fetch(scheduledEvent.guildId);
@@ -82,6 +84,39 @@ ${mentions}`
         });
 }
 
+const pingInChannel = async (scheduledEvent: GuildScheduledEvent) => {
+    const guild = await scheduledEvent.client.guilds.fetch(scheduledEvent.guildId);
+    const channel = await guild.channels.fetch(process.env.NEW_EVENT_CHANNEL!);
+    if (!channel || !channel.isText()) {
+        console.error("ERROR: unable to fetch new event channel");
+        return;
+    }
+    const role = await guild.roles.fetch(process.env.NEW_EVENT_ROLE!);
+    if (!role) {
+        console.error("ERROR: unable to fetch new event role");
+        return;
+    }
+
+    const message = `
+${role}
+https://discord.gg/${process.env.INVITE_CODE!}?event=${scheduledEvent.id}`;
+
+    channel
+        .send(message)
+        .catch(async (error) => {
+            console.log(`ERROR: Unable to send ping to channel ${channel.name}`)
+        });
+}
+
+const removePing = (id: string) => {
+    const timeout = pings[id];
+    if (!timeout) {
+        return
+    }
+    clearTimeout(timeout);
+    delete pings[id];
+}
+
 const removeReminder = (id: string) => {
     const reminder = reminders[id];
     if (!reminder) {
@@ -123,7 +158,21 @@ export const onGuildScheduledEvent = async (scheduledEvent: GuildScheduledEvent)
     }
 }
 
+export const onGuildScheduledEventCreate = async (scheduledEvent: GuildScheduledEvent) => {
+    onGuildScheduledEvent(scheduledEvent);
+
+    const now = Date.now();
+    const delay = 30 * minute;
+
+    if (scheduledEvent.scheduledStartAt.getTime() - delay < now) {
+        return;
+    }
+
+    pings[scheduledEvent.id] = setTimeout(pingInChannel, delay, scheduledEvent);
+}
+
 export const onGuildScheduledEventDelete = async (scheduledEvent: GuildScheduledEvent) => {
+    removePing(scheduledEvent.id);
     removeReminder(scheduledEvent.id);
 }
 
