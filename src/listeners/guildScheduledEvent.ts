@@ -73,7 +73,7 @@ const remindInChannel = async (scheduledEvent: GuildScheduledEvent) => {
     const mentions = subscribers.map(subscriber => `${subscriber.user}`).join('\n');
 
     const message = `
-Your event will start in 10 minutes. Please join the applicable VC now to get started. Typically the voice channel is created by the host, so look for a VC with the host's name. Or create one of your own by pressing <#964545089852543046>. If you need assistance, ask in the <#874388042205499422> channel.
+Your event will start in 10 minutes. Please join the applicable VC now to get started. Typically the voice channel is created by the event host, so look for a VC with the event host's name. Or create one of your own by pressing <#964545089852543046>. If you need assistance, ask in the <#874388042205499422> channel.
 
 ${mentions}`
 
