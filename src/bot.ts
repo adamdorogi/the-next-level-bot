@@ -1,20 +1,20 @@
 import 'dotenv/config'
-import { Client, Constants } from "discord.js";
+import { Client, Events, GatewayIntentBits } from "discord.js";
 import { onGuildScheduledEventCreate, onGuildScheduledEventDelete, onGuildScheduledEventUpdate, onGuildScheduledEventUserAdd, onGuildScheduledEventUserRemove } from './listeners/guildScheduledEvent';
 import { onReady } from './listeners/ready';
 
 const client = new Client({
-    intents: ['GUILD_SCHEDULED_EVENTS']
+    intents: GatewayIntentBits.GuildScheduledEvents
 });
 
-client.on(Constants.Events.DEBUG, async (info: string) => console.log(info));
-client.on(Constants.Events.ERROR, async (error: Error) => console.error(error));
+client.on(Events.Debug, async (info: string) => console.log(info));
+client.on(Events.Error, async (error: Error) => console.error(error));
 
-client.on(Constants.Events.CLIENT_READY, onReady);
-client.on(Constants.Events.GUILD_SCHEDULED_EVENT_CREATE, onGuildScheduledEventCreate);
-client.on(Constants.Events.GUILD_SCHEDULED_EVENT_DELETE, onGuildScheduledEventDelete);
-client.on(Constants.Events.GUILD_SCHEDULED_EVENT_UPDATE, onGuildScheduledEventUpdate);
-client.on(Constants.Events.GUILD_SCHEDULED_EVENT_USER_ADD, onGuildScheduledEventUserAdd);
-client.on(Constants.Events.GUILD_SCHEDULED_EVENT_USER_REMOVE, onGuildScheduledEventUserRemove);
+client.on(Events.ClientReady, onReady);
+client.on(Events.GuildScheduledEventCreate, onGuildScheduledEventCreate);
+client.on(Events.GuildScheduledEventDelete, onGuildScheduledEventDelete);
+client.on(Events.GuildScheduledEventUpdate, onGuildScheduledEventUpdate);
+client.on(Events.GuildScheduledEventUserAdd, onGuildScheduledEventUserAdd);
+client.on(Events.GuildScheduledEventUserRemove, onGuildScheduledEventUserRemove);
 
 client.login(process.env.DISCORD_TOKEN);

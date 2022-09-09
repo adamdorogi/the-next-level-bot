@@ -1,4 +1,4 @@
-import { GuildScheduledEvent, User } from "discord.js";
+import { Colors, GuildScheduledEvent, User } from "discord.js";
 
 const minute = 1000 * 60;
 
@@ -12,6 +12,9 @@ const reminders: Record<string, GuildScheduledEventReminder | undefined> = {};
 const pings: Record<string, NodeJS.Timeout | undefined> = {};
 
 const getEventChannel = async (scheduledEvent: GuildScheduledEvent) => {
+    if (!scheduledEvent.entityMetadata) {
+        return;
+    }
     const channelName = scheduledEvent.entityMetadata.location?.replace(/#/, '').trim().toLowerCase();
     const guild = await scheduledEvent.client.guilds.fetch(scheduledEvent.guildId);
     const activeThreads = await guild.channels.fetchActiveThreads();
@@ -28,7 +31,7 @@ const remindInDM = async (scheduledEvent: GuildScheduledEvent) => {
     const mentions = subscribers.map(subscriber => `${subscriber.member?.displayName || subscriber.user.username}`).join('\n');
 
     const channel = await getEventChannel(scheduledEvent);
-    const location = channel ? `${channel}` : scheduledEvent.entityMetadata.location;
+    const location = channel ? `${channel}` : scheduledEvent.entityMetadata?.location;
 
     const message = `
 Event Reminder:
@@ -48,13 +51,13 @@ ${mentions}`
             .catch(async (error) => {
                 const guild = await scheduledEvent.client.guilds.fetch(scheduledEvent.guildId);
                 const adminChannel = await guild.channels.fetch(process.env.ADMIN_CHANNEL!)
-                if (!adminChannel || !adminChannel.isText()) {
+                if (!adminChannel || !adminChannel.isTextBased()) {
                     return;
                 }
                 adminChannel.send({
                     embeds: [
                         {
-                            color: "ORANGE",
+                            color: Colors.Orange,
                             description: `Unable to send reminder DM to ${subscriber.user} for the **${scheduledEvent.name}** session.`
                         }
                     ]
@@ -65,7 +68,7 @@ ${mentions}`
 
 const remindInChannel = async (scheduledEvent: GuildScheduledEvent) => {
     const channel = await getEventChannel(scheduledEvent);
-    if (!channel || !(channel.isText() || channel.isThread())) {
+    if (!channel || !channel.isTextBased()) {
         return;
     }
 
@@ -87,7 +90,7 @@ ${mentions}`
 const pingInChannel = async (scheduledEvent: GuildScheduledEvent) => {
     const guild = await scheduledEvent.client.guilds.fetch(scheduledEvent.guildId);
     const channel = await guild.channels.fetch(process.env.NEW_EVENT_CHANNEL!);
-    if (!channel || !channel.isText()) {
+    if (!channel || !channel.isTextBased()) {
         console.error("ERROR: unable to fetch new event channel");
         return;
     }
@@ -152,6 +155,10 @@ export const onGuildScheduledEvent = async (scheduledEvent: GuildScheduledEvent)
         return;
     }
 
+    if (!scheduledEvent.scheduledStartAt) {
+        return;
+    }
+
     reminders[scheduledEvent.id] = {
         event: scheduledEvent,
         timeouts: remindForTime(scheduledEvent.scheduledStartAt.getTime(), scheduledEvent)
@@ -164,7 +171,7 @@ export const onGuildScheduledEventCreate = async (scheduledEvent: GuildScheduled
     const now = Date.now();
     const delay = 30 * minute;
 
-    if (scheduledEvent.scheduledStartAt.getTime() - delay < now) {
+    if (!scheduledEvent.scheduledStartAt || scheduledEvent.scheduledStartAt.getTime() - delay < now) {
         return;
     }
 
@@ -176,15 +183,18 @@ export const onGuildScheduledEventDelete = async (scheduledEvent: GuildScheduled
     removeReminder(scheduledEvent.id);
 }
 
-export const onGuildScheduledEventUpdate = async (_: GuildScheduledEvent, newScheduledEvent: GuildScheduledEvent) => onGuildScheduledEvent(newScheduledEvent);
+export const onGuildScheduledEventUpdate = async (_: GuildScheduledEvent | null, newScheduledEvent: GuildScheduledEvent) => onGuildScheduledEvent(newScheduledEvent);
 
 export const onGuildScheduledEventUserAdd = async (scheduledEvent: GuildScheduledEvent, user: User) => {
+    if (!scheduledEvent.scheduledStartAt) {
+        return;
+    }
     const timeDifference = scheduledEvent.scheduledStartAt.getTime() - Date.now()
     if (!scheduledEvent.isScheduled() || timeDifference >= (60 * minute)) {
         return;
     }
     const eventChannel = await getEventChannel(scheduledEvent);
-    if (!eventChannel || !(eventChannel.isText() || eventChannel.isThread())) {
+    if (!eventChannel || !eventChannel.isTextBased()) {
         return;
     }
     const guild = await scheduledEvent.client.guilds.fetch(scheduledEvent.guildId);
@@ -195,7 +205,7 @@ export const onGuildScheduledEventUserAdd = async (scheduledEvent: GuildSchedule
     eventChannel.send({
         embeds: [
             {
-                color: "BLUE",
+                color: Colors.Blue,
                 title: "Late Addition",
                 description: `**${member.displayName}** has signed up for the event. They are considered a backup if the session is already full.`
             }
@@ -204,6 +214,9 @@ export const onGuildScheduledEventUserAdd = async (scheduledEvent: GuildSchedule
 }
 
 export const onGuildScheduledEventUserRemove = async (scheduledEvent: GuildScheduledEvent, user: User) => {
+    if (!scheduledEvent.scheduledStartAt) {
+        return;
+    }
     const timeDifference = scheduledEvent.scheduledStartAt.getTime() - Date.now()
     if (!scheduledEvent.isScheduled() || timeDifference >= (60 * minute)) {
         return;
@@ -212,7 +225,7 @@ export const onGuildScheduledEventUserRemove = async (scheduledEvent: GuildSched
     const guild = await scheduledEvent.client.guilds.fetch(scheduledEvent.guildId);
 
     const eventChannel = await getEventChannel(scheduledEvent);
-    if (eventChannel && (eventChannel.isText() || eventChannel.isThread())) {
+    if (eventChannel && eventChannel.isTextBased()) {
         const member = await guild.members.fetch(user);
         if (!member) {
             return;
@@ -220,7 +233,7 @@ export const onGuildScheduledEventUserRemove = async (scheduledEvent: GuildSched
         eventChannel.send({
             embeds: [
                 {
-                    color: "RED",
+                    color: Colors.Red,
                     title: "Late Removal",
                     description: `**${member.displayName}** has removed their name from the session.`
                 }
@@ -229,11 +242,11 @@ export const onGuildScheduledEventUserRemove = async (scheduledEvent: GuildSched
     }
 
     const adminChannel = await guild.channels.fetch(process.env.ADMIN_CHANNEL!);
-    if (adminChannel && adminChannel.isText()) {
+    if (adminChannel && adminChannel.isTextBased()) {
         adminChannel.send({
             embeds: [
                 {
-                    color: "RED",
+                    color: Colors.Red,
                     description: `${user} has removed their name from the **${scheduledEvent.name}** session less than an hour before start.`
                 }
             ]
