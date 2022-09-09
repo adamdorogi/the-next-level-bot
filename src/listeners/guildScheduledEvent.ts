@@ -111,13 +111,14 @@ https://discord.gg/${process.env.INVITE_CODE!}?event=${scheduledEvent.id}`;
         });
 }
 
-const removePing = (id: string) => {
+export const removePing = (id: string) => {
     const timeout = pings[id];
     if (!timeout) {
-        return
+        return false;
     }
     clearTimeout(timeout);
     delete pings[id];
+    return true;
 }
 
 const removeReminder = (id: string) => {
