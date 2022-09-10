@@ -35,7 +35,7 @@ const remindInDM = async (scheduledEvent: GuildScheduledEvent) => {
 
     const message = `
 Event Reminder:
-This is a reminder for the **${scheduledEvent.name}** event that starts in 1 hour and 30 minutes. Please get ready and be on time for the session. Once you the ready, join the applicable voice channel to let others know that you are ready.
+This is a reminder for the **${scheduledEvent.name}** event that starts in 1 hour and 30 minutes. Please get ready and be on time for the session. Once you are ready, join the applicable voice channel to let others know that you are ready.
 
 If you expect to be late, please inform how late you will be. Or if you expect to be absent, please remove your name from the event within the next 30 minutes and inform in the ${location} channel.
 Removing your name within the hour before start of the session, failing to inform of any lateness or absenteeism may result in a warning. Please read our <#934632329421398026>, specifically rule 11.
