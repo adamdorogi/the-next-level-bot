@@ -12,7 +12,5 @@ export const onReady = async (client: Client) => {
 
     events.forEach(onGuildScheduledEvent);
 
-    guild.commands.set([]);
-
     client.application.commands.set(commands);
 }

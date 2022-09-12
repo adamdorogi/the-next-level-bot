@@ -1,10 +1,15 @@
-import { ChatInputApplicationCommandData, ChatInputCommandInteraction } from "discord.js";
+import { ChatInputApplicationCommandData, ChatInputCommandInteraction, WebhookEditMessageOptions } from "discord.js";
+import { ListCommand } from "./list";
+import { ModCommand } from "./mod";
 import { EventCommand } from "./scheduledEvent";
 
 export interface Command extends ChatInputApplicationCommandData {
-    execute: (interaction: ChatInputCommandInteraction) => Promise<void>;
+    ephemeral: boolean;
+    execute: (interaction: ChatInputCommandInteraction) => Promise<WebhookEditMessageOptions>;
 }
 
 export const commands: Command[] = [
-    EventCommand
+    EventCommand,
+    ListCommand,
+    ModCommand
 ];

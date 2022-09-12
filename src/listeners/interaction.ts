@@ -1,4 +1,4 @@
-import { Interaction } from "discord.js";
+import { Colors, EmbedBuilder, Interaction } from "discord.js";
 import { commands } from "../commands/command";
 
 export const onInteractionCreate = async (interaction: Interaction) => {
@@ -12,11 +12,13 @@ export const onInteractionCreate = async (interaction: Interaction) => {
     }
 
     try {
-        await command.execute(interaction);
+        await interaction.deferReply({ ephemeral: command.ephemeral });
+        const reply = await command.execute(interaction);
+        await interaction.editReply(reply);
     } catch (error) {
-        if (error) {
-            console.error(error);
-        }
-        await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
+        const embed = new EmbedBuilder()
+            .setColor(Colors.Red)
+            .setDescription(`:exclamation: ${error}`);
+        await interaction.editReply({ embeds: [embed] });
     }
 }

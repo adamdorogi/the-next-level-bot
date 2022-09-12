@@ -5,6 +5,7 @@ import { Command } from "./command";
 export const EventCommand: Command = {
     name: "event",
     description: "Manage events",
+    ephemeral: true,
     type: ApplicationCommandType.ChatInput,
     options: [
         {
@@ -22,13 +23,8 @@ export const EventCommand: Command = {
         },
     ],
     execute: async (interaction: ChatInputCommandInteraction) => {
-        const id = interaction.options.getString("event");
-        if (!id) {
-            interaction.reply({ content: 'The event ID is required.', ephemeral: true });
-            return;
-        }
-
+        const id = interaction.options.getString("event", true);
         var content = removePing(id) ? "Done!" : "No ping scheduled for given event ID.";
-        interaction.reply({ content, ephemeral: true });
+        return { content };
     }
 };
