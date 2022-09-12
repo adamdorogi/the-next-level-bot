@@ -63,7 +63,7 @@ export const ListCommand: Command = {
                             { $set: { [`entries.${interaction.user.id}`]: name } },
                             { upsert: true }
                         );
-                        result.modifiedCount == 0
+                        result.modifiedCount == 0 && result.upsertedCount == 0
                             ? embed.setDescription(`**${escapeMarkdown(name)}** is already on the player list.`)
                             : embed.setDescription(`**${escapeMarkdown(name)}** was added to the player list.`);
                     }
