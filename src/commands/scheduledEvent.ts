@@ -5,6 +5,7 @@ import { Command } from "./command";
 export const EventCommand: Command = {
     name: "event",
     description: "Manage events",
+    dmPermission: false,
     ephemeral: true,
     type: ApplicationCommandType.ChatInput,
     options: [

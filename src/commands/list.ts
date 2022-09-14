@@ -6,6 +6,7 @@ import { Command } from "./command";
 export const ListCommand: Command = {
     name: "list",
     description: "list",
+    dmPermission: false,
     ephemeral: false,
     type: ApplicationCommandType.ChatInput,
     options: [
@@ -87,7 +88,7 @@ export const ListCommand: Command = {
                     break;
                 case "view":
                     const result = await collection.findOne({ _id: interaction.channelId });
-                    const playerList = Object.values(result?.entries || {}).map(e => escapeMarkdown(e));
+                    const playerList = Object.values(result?.entries || {}).map(e => `‣ ${escapeMarkdown(e)}`);
                     embed
                         .setDescription(`**Player list for <#${interaction.channelId}>**\n\n${playerList.join('\n')}`)
                         .setFooter({ text: `${playerList.length} player${playerList.length == 1 ? '' : 's'}` });

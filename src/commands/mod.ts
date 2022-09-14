@@ -6,6 +6,7 @@ import { Command } from "./command";
 export const ModCommand: Command = {
     name: "mod",
     description: "mod",
+    dmPermission: false,
     ephemeral: false,
     type: ApplicationCommandType.ChatInput,
     options: [
