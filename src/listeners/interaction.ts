@@ -14,7 +14,9 @@ export const onInteractionCreate = async (interaction: Interaction) => {
     try {
         await interaction.deferReply({ ephemeral: command.ephemeral });
         const reply = await command.execute(interaction);
-        await interaction.editReply(reply);
+        reply == null
+            ? await interaction.deleteReply()
+            : await interaction.editReply(reply);
     } catch (error) {
         const embed = new EmbedBuilder()
             .setColor(Colors.Red)

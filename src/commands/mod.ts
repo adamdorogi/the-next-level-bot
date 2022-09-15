@@ -1,4 +1,4 @@
-import { ApplicationCommandOptionType, ApplicationCommandType, ChatInputCommandInteraction, EmbedBuilder, escapeMarkdown, GuildMember, userMention, WebhookEditMessageOptions } from "discord.js";
+import { ApplicationCommandOptionType, ApplicationCommandType, ChatInputCommandInteraction, EmbedBuilder, escapeMarkdown, GuildMember, userMention } from "discord.js";
 import { MongoClient } from "mongodb";
 import { TodoDocument } from "../db"
 import { Command } from "./command";
@@ -43,6 +43,19 @@ export const ModCommand: Command = {
                 },
                 {
                     type: ApplicationCommandOptionType.Subcommand,
+                    name: "ping",
+                    description: "Ping all users on this channel's player list with a message.",
+                    options: [
+                        {
+                            type: ApplicationCommandOptionType.String,
+                            name: "message",
+                            description: "The message to include when pinging users",
+                            required: true
+                        }
+                    ]
+                },
+                {
+                    type: ApplicationCommandOptionType.Subcommand,
                     name: "clear",
                     description: "Clear this channel's player list."
                 },
@@ -52,10 +65,12 @@ export const ModCommand: Command = {
                     description: "Set the minimum number of players required to boost.",
                     options: [
                         {
-                            type: ApplicationCommandOptionType.Number,
+                            type: ApplicationCommandOptionType.Integer,
                             name: "number",
                             description: "The minimum number of players",
-                            required: true
+                            required: true,
+                            minValue: 0,
+                            maxValue: 64
                         }
                     ]
                 },
@@ -67,8 +82,6 @@ export const ModCommand: Command = {
         try {
             await mongodb.connect();
             const collection = mongodb.db(process.env.DB!).collection<TodoDocument>("todo");
-
-            const response: WebhookEditMessageOptions = {};
 
             const subcommandGroup = interaction.options.getSubcommandGroup(true);
             switch (subcommandGroup) {
@@ -94,13 +107,14 @@ export const ModCommand: Command = {
                                     ? `**${escapeMarkdown(name)}** is already on the player list.`
                                     : `**${escapeMarkdown(name)}** was added to the player list.`;
 
-                                response.embeds = [
-                                    new EmbedBuilder()
-                                        .setColor(0xfff000)
-                                        .setDescription(description)
-                                ];
+                                return {
+                                    embeds: [
+                                        new EmbedBuilder()
+                                            .setColor(0xfff000)
+                                            .setDescription(description)
+                                    ]
+                                };
                             }
-                            break;
                         case "remove":
                             {
                                 const user = interaction.options.getUser("user", true);
@@ -118,38 +132,68 @@ export const ModCommand: Command = {
                                     ? `**${escapeMarkdown(name)}** is not on the player list.`
                                     : `**${escapeMarkdown(name)}** was removed from the player list.`;
 
-                                response.embeds = [
-                                    new EmbedBuilder()
-                                        .setColor(0xfff000)
-                                        .setDescription(description)
-                                ];
+                                return {
+                                    embeds: [
+                                        new EmbedBuilder()
+                                            .setColor(0xfff000)
+                                            .setDescription(description)
+                                    ]
+                                };
                             }
-                            break;
+                        case "ping":
+                            {
+                                const result = await collection.findOne({ _id: interaction.channelId });
+                                const mentions = Object.keys(result?.entries || {}).map(userMention);
+                                if (mentions.length == 0) {
+                                    return {
+                                        embeds: [
+                                            new EmbedBuilder()
+                                                .setColor(0xfff000)
+                                                .setDescription('The player list is empty.')
+                                        ]
+                                    };
+                                }
+
+                                const channel = await interaction.guild!.channels.fetch(interaction.channelId);
+                                if (!channel || !channel.isTextBased()) {
+                                    throw "can not run command in this channel"
+                                }
+
+                                const message = interaction.options.getString("message", true);
+                                await channel.send(`${mentions.join(' ')}\n\n${message}`);
+
+                                return null;
+                            }
                         case "clear":
                             {
-                                await collection.deleteOne({ _id: interaction.channelId });
-                                response.embeds = [
-                                    new EmbedBuilder()
-                                        .setColor(0xfff000)
-                                        .setDescription('The player list has been cleared.')
-                                ];
+                                await collection.updateOne(
+                                    { _id: interaction.channelId },
+                                    { $unset: { entries: "" } }
+                                );
+                                return {
+                                    embeds: [
+                                        new EmbedBuilder()
+                                            .setColor(0xfff000)
+                                            .setDescription('The player list has been cleared.')
+                                    ]
+                                };
                             }
-                            break;
                         case "min-players":
                             {
-                                const number = interaction.options.getNumber("number", true);
+                                const number = interaction.options.getInteger("number", true);
                                 await collection.updateOne(
                                     { _id: interaction.channelId },
                                     { $set: { needed: number } },
                                     { upsert: true }
                                 );
-                                response.embeds = [
-                                    new EmbedBuilder()
-                                        .setColor(0xfff000)
-                                        .setDescription(`Minimum players set to **${number}**.`)
-                                ];
+                                return {
+                                    embeds: [
+                                        new EmbedBuilder()
+                                            .setColor(0xfff000)
+                                            .setDescription(`Minimum players set to **${number}**.`)
+                                    ]
+                                };
                             }
-                            break;
                         default:
                             throw 'unknown subcommand';
                     }
@@ -157,8 +201,6 @@ export const ModCommand: Command = {
                 default:
                     throw 'unknown subcommand group';
             }
-
-            return response;
         } finally {
             mongodb.close();
         }

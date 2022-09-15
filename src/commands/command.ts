@@ -5,7 +5,7 @@ import { EventCommand } from "./scheduledEvent";
 
 export interface Command extends ChatInputApplicationCommandData {
     ephemeral: boolean;
-    execute: (interaction: ChatInputCommandInteraction) => Promise<WebhookEditMessageOptions>;
+    execute: (interaction: ChatInputCommandInteraction) => Promise<WebhookEditMessageOptions | null>;
 }
 
 export const commands: Command[] = [

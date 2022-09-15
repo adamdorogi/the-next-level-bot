@@ -5,6 +5,7 @@ import { onReady } from './listeners/ready';
 import { onInteractionCreate } from './listeners/interaction';
 
 const client = new Client({
+    allowedMentions: { parse: ['users', 'roles'] },
     intents: GatewayIntentBits.GuildScheduledEvents
 });
 
