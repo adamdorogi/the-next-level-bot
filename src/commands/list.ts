@@ -89,9 +89,13 @@ export const ListCommand: Command = {
                 case "view":
                     const result = await collection.findOne({ _id: interaction.channelId });
                     const playerList = Object.values(result?.entries || {}).map(e => `‣ ${escapeMarkdown(e)}`);
+                    let footer = `${playerList.length} player${playerList.length == 1 ? '' : 's'}`;
+                    if (result && result.needed > 0) {
+                        footer += ` (minimum ${result.needed} required)`;
+                    }
                     embed
                         .setDescription(`**Player list for <#${interaction.channelId}>**\n\n${playerList.join('\n')}`)
-                        .setFooter({ text: `${playerList.length} player${playerList.length == 1 ? '' : 's'}` });
+                        .setFooter({ text: footer });
                     break;
                 default:
                     throw 'unknown subcommand';
