@@ -3,10 +3,12 @@ import { Client, Events, GatewayIntentBits } from "discord.js";
 import { onGuildScheduledEventCreate, onGuildScheduledEventDelete, onGuildScheduledEventUpdate, onGuildScheduledEventUserAdd, onGuildScheduledEventUserRemove } from './listeners/guildScheduledEvent';
 import { onReady } from './listeners/ready';
 import { onInteractionCreate } from './listeners/interaction';
+import { onChannelDelete } from './listeners/channel';
+import { onThreadDelete } from './listeners/thread';
 
 const client = new Client({
     allowedMentions: { parse: ['users', 'roles'] },
-    intents: GatewayIntentBits.GuildScheduledEvents
+    intents: GatewayIntentBits.Guilds | GatewayIntentBits.GuildScheduledEvents
 });
 
 client.on(Events.Debug, async (info: string) => console.log(info));
@@ -19,5 +21,7 @@ client.on(Events.GuildScheduledEventUpdate, onGuildScheduledEventUpdate);
 client.on(Events.GuildScheduledEventUserAdd, onGuildScheduledEventUserAdd);
 client.on(Events.GuildScheduledEventUserRemove, onGuildScheduledEventUserRemove);
 client.on(Events.InteractionCreate, onInteractionCreate);
+client.on(Events.ChannelDelete, onChannelDelete);
+client.on(Events.ThreadDelete, onThreadDelete);
 
 client.login(process.env.DISCORD_TOKEN);

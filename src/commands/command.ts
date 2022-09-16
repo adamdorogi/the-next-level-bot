@@ -1,6 +1,7 @@
 import { ChatInputCommandInteraction, SlashCommandBuilder, SlashCommandOptionsOnlyBuilder, SlashCommandSubcommandsOnlyBuilder, WebhookEditMessageOptions } from "discord.js";
 import { ListCommand } from "./list";
 import { ModCommand } from "./mod";
+import { MyCommand } from "./my";
 import { EventCommand } from "./scheduledEvent";
 
 export type Command = {
@@ -13,4 +14,5 @@ export const commands: Command[] = [
     EventCommand,
     ListCommand,
     ModCommand,
+    MyCommand,
 ];
