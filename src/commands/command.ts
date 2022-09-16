@@ -1,9 +1,10 @@
-import { ChatInputApplicationCommandData, ChatInputCommandInteraction, WebhookEditMessageOptions } from "discord.js";
+import { ChatInputCommandInteraction, SlashCommandBuilder, SlashCommandOptionsOnlyBuilder, SlashCommandSubcommandsOnlyBuilder, WebhookEditMessageOptions } from "discord.js";
 import { ListCommand } from "./list";
 import { ModCommand } from "./mod";
 import { EventCommand } from "./scheduledEvent";
 
-export interface Command extends ChatInputApplicationCommandData {
+export type Command = {
+    builder: SlashCommandBuilder | SlashCommandSubcommandsOnlyBuilder | SlashCommandOptionsOnlyBuilder;
     ephemeral: boolean;
     execute: (interaction: ChatInputCommandInteraction) => Promise<WebhookEditMessageOptions | null>;
 }
@@ -11,5 +12,5 @@ export interface Command extends ChatInputApplicationCommandData {
 export const commands: Command[] = [
     EventCommand,
     ListCommand,
-    ModCommand
+    ModCommand,
 ];

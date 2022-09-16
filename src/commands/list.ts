@@ -1,46 +1,40 @@
-import { ApplicationCommandOptionType, ApplicationCommandType, ChatInputCommandInteraction, EmbedBuilder, escapeMarkdown, GuildMember } from "discord.js";
+import { EmbedBuilder, escapeMarkdown, GuildMember, SlashCommandBuilder } from "discord.js";
 import { MongoClient } from "mongodb";
-import { TodoDocument } from "../db"
+import { TodoDocument } from "../db";
 import { Command } from "./command";
 
 export const ListCommand: Command = {
-    name: "list",
-    description: "list",
-    dmPermission: false,
+    builder: new SlashCommandBuilder()
+        .setName("list")
+        .setDescription("list")
+        .setDMPermission(false)
+        .addSubcommandGroup(
+            option => option
+                .setName("add")
+                .setDescription("add")
+                .addSubcommand(
+                    option => option
+                        .setName("me")
+                        .setDescription("Add yourself to the player list for this channel.")
+                )
+        )
+        .addSubcommandGroup(
+            option => option
+                .setName("remove")
+                .setDescription("remove")
+                .addSubcommand(
+                    option => option
+                        .setName("me")
+                        .setDescription("Remove yourself from the player list for this channel.")
+                )
+        )
+        .addSubcommand(
+            option => option
+                .setName("view")
+                .setDescription("View the player list for this channel.")
+        ),
     ephemeral: false,
-    type: ApplicationCommandType.ChatInput,
-    options: [
-        {
-            type: ApplicationCommandOptionType.SubcommandGroup,
-            name: "add",
-            description: "add",
-            options: [
-                {
-                    type: ApplicationCommandOptionType.Subcommand,
-                    name: "me",
-                    description: "Add yourself to the player list for this channel.",
-                }
-            ]
-        },
-        {
-            type: ApplicationCommandOptionType.SubcommandGroup,
-            name: "remove",
-            description: "remove",
-            options: [
-                {
-                    type: ApplicationCommandOptionType.Subcommand,
-                    name: "me",
-                    description: "Remove yourself from the player list for this channel.",
-                }
-            ]
-        },
-        {
-            type: ApplicationCommandOptionType.Subcommand,
-            name: "view",
-            description: "View the player list for this channel.",
-        },
-    ],
-    execute: async (interaction: ChatInputCommandInteraction) => {
+    execute: async (interaction) => {
         const mongodb = new MongoClient(process.env.MONGODB_ENDPOINT!);
         try {
             await mongodb.connect();

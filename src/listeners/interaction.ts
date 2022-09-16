@@ -6,7 +6,7 @@ export const onInteractionCreate = async (interaction: Interaction) => {
         return;
     }
 
-    const command = commands.find(command => command.name === interaction.commandName);
+    const command = commands.find(command => command.builder.name === interaction.commandName);
     if (!command) {
         return;
     }

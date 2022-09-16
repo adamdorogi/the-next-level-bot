@@ -1,83 +1,71 @@
-import { ApplicationCommandOptionType, ApplicationCommandType, ChatInputCommandInteraction, EmbedBuilder, escapeMarkdown, GuildMember, userMention } from "discord.js";
+import { EmbedBuilder, escapeMarkdown, GuildMember, SlashCommandBuilder, userMention } from "discord.js";
 import { MongoClient } from "mongodb";
-import { TodoDocument } from "../db"
+import { TodoDocument } from "../db";
 import { Command } from "./command";
 
 export const ModCommand: Command = {
-    name: "mod",
-    description: "mod",
-    dmPermission: false,
+    builder: new SlashCommandBuilder()
+        .setName("mod")
+        .setDescription("mod")
+        .setDMPermission(false)
+        .addSubcommandGroup(
+            option => option
+                .setName("list")
+                .setDescription("list")
+                .addSubcommand(
+                    option => option
+                        .setName("add")
+                        .setDescription("Add a user to this channel's player list.")
+                        .addUserOption(
+                            option => option
+                                .setName("user")
+                                .setDescription("The user to add")
+                                .setRequired(true)
+                        )
+                )
+                .addSubcommand(
+                    option => option
+                        .setName("remove")
+                        .setDescription("Remove a user from this channel's player list.")
+                        .addUserOption(
+                            option => option
+                                .setName("user")
+                                .setDescription("The user to remove")
+                                .setRequired(true)
+                        )
+                )
+                .addSubcommand(
+                    option => option
+                        .setName("ping")
+                        .setDescription("Ping all users on this channel's player list with a message.")
+                        .addStringOption(
+                            option => option
+                                .setName("message")
+                                .setDescription("The message to include when pinging users")
+                                .setRequired(true)
+                        )
+                )
+                .addSubcommand(
+                    option => option
+                        .setName("clear")
+                        .setDescription("Clear this channel's player list.")
+                )
+                .addSubcommand(
+                    option => option
+                        .setName("min-players")
+                        .setDescription("Set the minimum number of players required to boost.")
+                        .addIntegerOption(
+                            option => option
+                                .setName("number")
+                                .setDescription("The minimum number of players")
+                                .setRequired(true)
+                                .setMinValue(0)
+                                .setMaxValue(64)
+                        )
+                )
+        ),
     ephemeral: false,
-    type: ApplicationCommandType.ChatInput,
-    options: [
-        {
-            type: ApplicationCommandOptionType.SubcommandGroup,
-            name: "list",
-            description: "list",
-            options: [
-                {
-                    type: ApplicationCommandOptionType.Subcommand,
-                    name: "add",
-                    description: "Add a user to this channel's player list.",
-                    options: [
-                        {
-                            type: ApplicationCommandOptionType.User,
-                            name: "user",
-                            description: "The user to add",
-                            required: true
-                        }
-                    ]
-                },
-                {
-                    type: ApplicationCommandOptionType.Subcommand,
-                    name: "remove",
-                    description: "Remove a user from this channel's player list.",
-                    options: [
-                        {
-                            type: ApplicationCommandOptionType.User,
-                            name: "user",
-                            description: "The user to remove",
-                            required: true
-                        }
-                    ]
-                },
-                {
-                    type: ApplicationCommandOptionType.Subcommand,
-                    name: "ping",
-                    description: "Ping all users on this channel's player list with a message.",
-                    options: [
-                        {
-                            type: ApplicationCommandOptionType.String,
-                            name: "message",
-                            description: "The message to include when pinging users",
-                            required: true
-                        }
-                    ]
-                },
-                {
-                    type: ApplicationCommandOptionType.Subcommand,
-                    name: "clear",
-                    description: "Clear this channel's player list."
-                },
-                {
-                    type: ApplicationCommandOptionType.Subcommand,
-                    name: "min-players",
-                    description: "Set the minimum number of players required to boost.",
-                    options: [
-                        {
-                            type: ApplicationCommandOptionType.Integer,
-                            name: "number",
-                            description: "The minimum number of players",
-                            required: true,
-                            minValue: 0,
-                            maxValue: 64
-                        }
-                    ]
-                },
-            ]
-        },
-    ],
-    execute: async (interaction: ChatInputCommandInteraction) => {
+    execute: async (interaction) => {
         const mongodb = new MongoClient(process.env.MONGODB_ENDPOINT!);
         try {
             await mongodb.connect();
