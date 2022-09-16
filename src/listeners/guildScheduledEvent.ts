@@ -87,9 +87,9 @@ ${mentions}`
         });
 }
 
-const pingInChannel = async (scheduledEvent: GuildScheduledEvent) => {
+const pingInChannel = async (scheduledEvent: GuildScheduledEvent, channelId: string, includeMention: boolean) => {
     const guild = await scheduledEvent.client.guilds.fetch(scheduledEvent.guildId);
-    const channel = await guild.channels.fetch(process.env.NEW_EVENT_CHANNEL!);
+    const channel = await guild.channels.fetch(channelId);
     if (!channel || !channel.isTextBased()) {
         console.error("ERROR: unable to fetch new event channel");
         return;
@@ -100,9 +100,10 @@ const pingInChannel = async (scheduledEvent: GuildScheduledEvent) => {
         return;
     }
 
-    const message = `
-${role}
-https://discord.gg/${process.env.INVITE_CODE!}?event=${scheduledEvent.id}`;
+    let message = `https://discord.gg/${process.env.INVITE_CODE!}?event=${scheduledEvent.id}`;
+    if (includeMention) {
+        message = `${role}\n${message}`;
+    }
 
     channel
         .send(message)
@@ -169,6 +170,11 @@ export const onGuildScheduledEvent = async (scheduledEvent: GuildScheduledEvent)
 export const onGuildScheduledEventCreate = async (scheduledEvent: GuildScheduledEvent) => {
     onGuildScheduledEvent(scheduledEvent);
 
+    const channel = await getEventChannel(scheduledEvent);
+    if (channel) {
+        await pingInChannel(scheduledEvent, channel.id, false);
+    }
+
     const now = Date.now();
     const delay = 30 * minute;
 
@@ -176,7 +182,7 @@ export const onGuildScheduledEventCreate = async (scheduledEvent: GuildScheduled
         return;
     }
 
-    pings[scheduledEvent.id] = setTimeout(pingInChannel, delay, scheduledEvent);
+    pings[scheduledEvent.id] = setTimeout(pingInChannel, delay, scheduledEvent, process.env.NEW_EVENT_CHANNEL!, true);
 }
 
 export const onGuildScheduledEventDelete = async (scheduledEvent: GuildScheduledEvent) => {
