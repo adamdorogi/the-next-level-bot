@@ -31,13 +31,27 @@ const remindInDM = async (scheduledEvent: GuildScheduledEvent) => {
     const mentions = subscribers.map(subscriber => `${subscriber.member?.displayName || subscriber.user.username}`).join('\n');
 
     const channel = await getEventChannel(scheduledEvent);
-    const location = channel ? `${channel}` : scheduledEvent.entityMetadata?.location;
+    if (!channel) {
+        const guild = await scheduledEvent.client.guilds.fetch(scheduledEvent.guildId);
+        const adminChannel = await guild.channels.fetch(process.env.ADMIN_CHANNEL!)
+        if (adminChannel && adminChannel.isTextBased()) {
+            adminChannel.send({
+                embeds: [
+                    {
+                        color: Colors.Red,
+                        description: `Unable to find the channel for the **${scheduledEvent.name}** session. DM reminders have not been sent.`
+                    }
+                ]
+            });
+        }
+        return;
+    }
 
     const message = `
 Event Reminder:
 This is a reminder for the **${scheduledEvent.name}** event that starts in 1 hour and 30 minutes. Please get ready and be on time for the session. Once you are ready, join the applicable voice channel to let others know that you are ready.
 
-If you expect to be late, please inform how late you will be. Or if you expect to be absent, please remove your name from the event within the next 30 minutes and inform in the ${location} channel.
+If you expect to be late, please inform how late you will be. Or if you expect to be absent, please remove your name from the event within the next 30 minutes and inform in the ${channel} channel.
 Removing your name within the hour before start of the session, failing to inform of any lateness or absenteeism may result in a warning. Please read our <#934632329421398026>, specifically rule 11.
 
 If you require any assistance, please head over to the <#874388042205499422> channel and ask for it. Tagging one of the online staff members will get you a faster response.
@@ -69,6 +83,18 @@ ${mentions}`
 const remindInChannel = async (scheduledEvent: GuildScheduledEvent) => {
     const channel = await getEventChannel(scheduledEvent);
     if (!channel || !channel.isTextBased()) {
+        const guild = await scheduledEvent.client.guilds.fetch(scheduledEvent.guildId);
+        const adminChannel = await guild.channels.fetch(process.env.ADMIN_CHANNEL!)
+        if (adminChannel && adminChannel.isTextBased()) {
+            adminChannel.send({
+                embeds: [
+                    {
+                        color: Colors.Red,
+                        description: `Unable to find the channel for the **${scheduledEvent.name}** session. DM reminders have not been sent.`
+                    }
+                ]
+            });
+        }
         return;
     }
 
