@@ -90,7 +90,7 @@ const remindInChannel = async (scheduledEvent: GuildScheduledEvent) => {
                 embeds: [
                     {
                         color: Colors.Red,
-                        description: `Unable to find the channel for the **${scheduledEvent.name}** session. DM reminders have not been sent.`
+                        description: `Unable to find the channel for the **${scheduledEvent.name}** session. Channel reminder has not been sent.`
                     }
                 ]
             });
