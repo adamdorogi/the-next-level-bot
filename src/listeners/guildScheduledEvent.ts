@@ -48,15 +48,15 @@ const remindInDM = async (scheduledEvent: GuildScheduledEvent) => {
     }
 
     const message = `
-Event Reminder:
-This is a reminder for the **${scheduledEvent.name}** event that starts in 1 hour and 30 minutes. Please get ready and be on time for the session. Once you are ready, join the applicable voice channel to let others know that you are ready.
+This is an event reminder for a upcoming session for **${scheduledEvent.name}**. It is starting in one hour and thirty minutes (1hr 30mins) from this message. 
 
-If you expect to be late, please inform how late you will be. Or if you expect to be absent, please remove your name from the event within the next 30 minutes and inform in the ${channel} channel.
-Removing your name within the hour before start of the session, failing to inform of any lateness or absenteeism may result in a warning. Please read our <#934632329421398026>, specifically rule 11.
+If you are going to be late, it is best to say now so others are aware. If you can't be in the session then please let someone know ASAP, The earlier the better.
 
-If you require any assistance, please head over to the <#874388042205499422> channel and ask for it. Tagging one of the online staff members will get you a faster response.
+Please join the applicable VC 10 minutes before the event starts.
 
-Confirmed Members:
+If you can not make the session then tag a helper to get things sorted out. If the helper doesn't respond then a Mod or Admin can help.
+
+Player list, 
 ${mentions}`
 
     subscribers.forEach(subscriber => {
@@ -102,7 +102,7 @@ const remindInChannel = async (scheduledEvent: GuildScheduledEvent) => {
     const mentions = subscribers.map(subscriber => `${subscriber.user}`).join('\n');
 
     const message = `
-Your event will start in 10 minutes. Please join the applicable VC now to get started. Typically the voice channel is created by the event host, so look for a VC with the event host's name. Or create one of your own by pressing <#964545089852543046>. If you need assistance, ask in the <#874388042205499422> channel.
+Your event will start in 10 minutes. Please join the applicable VC now to get started. Typically the voice channel is created by the event host, so look for a VC with the event host's name.
 
 ${mentions}`
 
