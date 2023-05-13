@@ -3,6 +3,7 @@ import { ListCommand } from "./list";
 import { ModCommand } from "./mod";
 import { MyCommand } from "./my";
 import { EventCommand } from "./scheduledEvent";
+import { AnnounceCommand } from "./announce";
 
 export type Command = {
     builder: SlashCommandBuilder | SlashCommandSubcommandsOnlyBuilder | SlashCommandOptionsOnlyBuilder;
@@ -15,4 +16,5 @@ export const commands: Command[] = [
     ListCommand,
     ModCommand,
     MyCommand,
+    AnnounceCommand
 ];
