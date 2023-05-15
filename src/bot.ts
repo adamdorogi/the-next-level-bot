@@ -6,10 +6,11 @@ import { onInteractionCreate } from './listeners/interaction';
 import { onChannelDelete } from './listeners/channel';
 import { onThreadDelete } from './listeners/thread';
 import { onMemberJoin } from './listeners/member';
+import { addRole, removeRole } from './listeners/role';
 
 const client = new Client({
     allowedMentions: { parse: ['users', 'roles'] },
-    intents: GatewayIntentBits.Guilds | GatewayIntentBits.GuildScheduledEvents | GatewayIntentBits.GuildMembers
+    intents: GatewayIntentBits.Guilds | GatewayIntentBits.GuildScheduledEvents | GatewayIntentBits.GuildMembers | GatewayIntentBits.GuildMessageReactions
 });
 
 client.on(Events.Debug, async (info: string) => console.log(info));
@@ -25,5 +26,7 @@ client.on(Events.InteractionCreate, onInteractionCreate);
 client.on(Events.ChannelDelete, onChannelDelete);
 client.on(Events.ThreadDelete, onThreadDelete);
 client.on(Events.GuildMemberAdd, onMemberJoin)
+client.on(Events.MessageReactionAdd, addRole)
+client.on(Events.MessageReactionRemove, removeRole)
 
 client.login(process.env.DISCORD_TOKEN);
