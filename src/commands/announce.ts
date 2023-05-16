@@ -5,7 +5,23 @@ export const AnnounceCommand: Command = {
     builder: new SlashCommandBuilder()
         .setName("announce")
         .setDescription("Make an announcement on this channel.")
+        .addStringOption(
+            option => option
+            .setName("message")
+            .setDescription("The message to announce.")
+            .setRequired(true)
+        )
         .setDMPermission(false),
     ephemeral: false,
-    execute: async () => null
+    execute: async (interaction) => {
+        const message = interaction.options.getString("message", true);
+        const channel = interaction.channel
+
+        if (channel !== null) {
+            console.log(`Sending message to channel ${channel.id}:`, message);
+            await channel.send(message);
+        }
+
+        return null;
+    }
 };
