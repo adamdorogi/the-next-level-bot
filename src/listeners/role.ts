@@ -11,7 +11,7 @@ export const addRole = async (reaction: MessageReaction | PartialMessageReaction
     const roleId = messageId[(reaction.emoji.id || reaction.emoji.name)!];
     if (!roleId) {
         // A reaction to one of our messages specified in the config, but with an invalid emoji, so remove it.
-        console.log("Invalid emoji specified.")
+        console.log(`Invalid emoji specified. Emoji ID: ${reaction.emoji.id}, Emoji name: ${reaction.emoji.name}`)
         await reaction.remove();
         return;
     }
