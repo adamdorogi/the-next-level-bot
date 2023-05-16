@@ -11,7 +11,7 @@ import { onMessageCreate, onMessageUpdate } from './listeners/message';
 
 const client = new Client({
     allowedMentions: { parse: ['users', 'roles'] },
-    intents: GatewayIntentBits.Guilds | GatewayIntentBits.GuildScheduledEvents | GatewayIntentBits.GuildMembers | GatewayIntentBits.GuildMessageReactions
+    intents: GatewayIntentBits.Guilds | GatewayIntentBits.GuildScheduledEvents | GatewayIntentBits.GuildMembers | GatewayIntentBits.GuildMessageReactions | GatewayIntentBits.GuildMessages
 });
 
 client.on(Events.Debug, async (info: string) => console.log(info));

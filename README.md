@@ -5,7 +5,7 @@ Discord bot for The Next Level [discord.gg/the-next-level](https://discord.gg/th
 ## Setup and Usage
 
 1. Create a bot on Discord Developer Portal
-   - Under "Bot", Enable server members intent
+   - Under "Bot", Enable server members intent and message intent
 2. Get the code and install dependencies
    ```
    git clone https://github.com/adamdorogi/the-next-level-bot
