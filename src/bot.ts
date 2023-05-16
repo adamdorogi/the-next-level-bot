@@ -7,6 +7,7 @@ import { onChannelDelete } from './listeners/channel';
 import { onThreadDelete } from './listeners/thread';
 import { onMemberJoin } from './listeners/member';
 import { addRole, removeRole } from './listeners/role';
+import { onMessageCreate, onMessageUpdate } from './listeners/message';
 
 const client = new Client({
     allowedMentions: { parse: ['users', 'roles'] },
@@ -28,5 +29,7 @@ client.on(Events.ThreadDelete, onThreadDelete);
 client.on(Events.GuildMemberAdd, onMemberJoin)
 client.on(Events.MessageReactionAdd, addRole)
 client.on(Events.MessageReactionRemove, removeRole)
+client.on(Events.MessageCreate, onMessageCreate)
+client.on(Events.MessageUpdate, onMessageUpdate)
 
 client.login(process.env.DISCORD_TOKEN);
