@@ -1,8 +1,8 @@
 import { MessageReaction, PartialMessageReaction, PartialUser, User } from "discord.js"
-import roleConfig from "../roleConfig"
+import config from "../config"
 
 export const addRole = async (reaction: MessageReaction | PartialMessageReaction, user: User | PartialUser) => {
-    const messageId = roleConfig[reaction.message.channelId]?.[reaction.message.id]
+    const messageId = config.guilds[reaction.message.guild!.id].rolesChannels[reaction.message.channelId]?.[reaction.message.id]
     if (!messageId) {
         // Not a reaction to one of our messages specified in the config, so ignore it.
         return;
@@ -29,7 +29,7 @@ export const addRole = async (reaction: MessageReaction | PartialMessageReaction
 }
 
 export const removeRole = async (reaction: MessageReaction | PartialMessageReaction, user: User | PartialUser) => {
-    const roleId = roleConfig[reaction.message.channelId]?.[reaction.message.id]?.[(reaction.emoji.id || reaction.emoji.name)!];
+    const roleId = config.guilds[reaction.message.guild!.id].rolesChannels[reaction.message.channelId]?.[reaction.message.id]?.[(reaction.emoji.id || reaction.emoji.name)!];
     if (!roleId) {
         // Not a reaction remove from one of our messages specified in the config, so ignore it.
         // Or IS a reaction remove from one of our messages specified in the config, but with an invalid emoji, so ignore. Shouldn't really happen.

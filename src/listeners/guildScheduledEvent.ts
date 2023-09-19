@@ -1,4 +1,5 @@
 import { Colors, GuildScheduledEvent, User } from "discord.js";
+import config from "../config";
 
 const minute = 1000 * 60;
 
@@ -33,7 +34,8 @@ const remindInDM = async (scheduledEvent: GuildScheduledEvent) => {
     const channel = await getEventChannel(scheduledEvent);
     if (!channel) {
         const guild = await scheduledEvent.client.guilds.fetch(scheduledEvent.guildId);
-        const adminChannel = await guild.channels.fetch(process.env.ADMIN_CHANNEL!)
+        const adminChannelId = config.guilds[guild.id].adminChannel;
+        const adminChannel = await guild.channels.fetch(adminChannelId)
         if (adminChannel && adminChannel.isTextBased()) {
             adminChannel.send({
                 embeds: [
@@ -64,7 +66,8 @@ ${mentions}`
             .send(message)
             .catch(async (error) => {
                 const guild = await scheduledEvent.client.guilds.fetch(scheduledEvent.guildId);
-                const adminChannel = await guild.channels.fetch(process.env.ADMIN_CHANNEL!)
+                const adminChannelId = config.guilds[guild.id].adminChannel;
+                const adminChannel = await guild.channels.fetch(adminChannelId)
                 if (!adminChannel || !adminChannel.isTextBased()) {
                     return;
                 }
@@ -84,7 +87,8 @@ const remindInChannel = async (scheduledEvent: GuildScheduledEvent) => {
     const channel = await getEventChannel(scheduledEvent);
     if (!channel || !channel.isTextBased()) {
         const guild = await scheduledEvent.client.guilds.fetch(scheduledEvent.guildId);
-        const adminChannel = await guild.channels.fetch(process.env.ADMIN_CHANNEL!)
+        const adminChannelId = config.guilds[guild.id].adminChannel;
+        const adminChannel = await guild.channels.fetch(adminChannelId)
         if (adminChannel && adminChannel.isTextBased()) {
             adminChannel.send({
                 embeds: [
@@ -120,15 +124,17 @@ const pingInChannel = async (scheduledEvent: GuildScheduledEvent, channelId: str
         console.error("ERROR: unable to fetch new event channel");
         return;
     }
-    const role = await guild.roles.fetch(process.env.NEW_EVENT_ROLE!);
-    if (!role) {
-        console.error("ERROR: unable to fetch new event role");
-        return;
-    }
 
-    let message = `https://discord.gg/${process.env.INVITE_CODE!}?event=${scheduledEvent.id}`;
+    const inviteCode = config.guilds[guild.id].inviteCode;
+    let message = `https://discord.gg/${inviteCode}?event=${scheduledEvent.id}`;
     if (includeMention) {
-        message = `${role}\n${message}`;
+        const newEventRoleId = config.guilds[guild.id].newEventRole;
+        const role = await guild.roles.fetch(newEventRoleId);
+        if (role) {
+            message = `${role}\n${message}`;
+        } else {
+            console.error("ERROR: unable to fetch new event role");
+        }
     }
 
     channel
@@ -208,7 +214,8 @@ export const onGuildScheduledEventCreate = async (scheduledEvent: GuildScheduled
         return;
     }
 
-    pings[scheduledEvent.id] = setTimeout(pingInChannel, delay, scheduledEvent, process.env.NEW_EVENT_CHANNEL!, true);
+    const newEventChannelId = config.guilds[scheduledEvent.guildId].newEventChannel;
+    pings[scheduledEvent.id] = setTimeout(pingInChannel, delay, scheduledEvent, newEventChannelId, true);
 }
 
 export const onGuildScheduledEventDelete = async (scheduledEvent: GuildScheduledEvent) => {
@@ -274,7 +281,8 @@ export const onGuildScheduledEventUserRemove = async (scheduledEvent: GuildSched
         });
     }
 
-    const adminChannel = await guild.channels.fetch(process.env.ADMIN_CHANNEL!);
+    const adminChannelId = config.guilds[guild.id].adminChannel;
+    const adminChannel = await guild.channels.fetch(adminChannelId)
     if (adminChannel && adminChannel.isTextBased()) {
         adminChannel.send({
             embeds: [

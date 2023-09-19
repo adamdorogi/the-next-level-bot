@@ -38,7 +38,7 @@ export const ListCommand: Command = {
         const mongodb = new MongoClient(process.env.MONGODB_ENDPOINT!);
         try {
             await mongodb.connect();
-            const collection = mongodb.db(process.env.DB!).collection<TodoDocument>("todo");
+            const collection = mongodb.db(process.env.DB!).collection<TodoDocument>(interaction.guildId!);
 
             const embed = new EmbedBuilder().setColor(0xfff000);
 

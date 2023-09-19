@@ -8,7 +8,7 @@ export const onThreadDelete = async (thread: AnyThreadChannel) => {
         await mongodb.connect();
         await mongodb
             .db(process.env.DB!)
-            .collection<TodoDocument>("todo")
+            .collection<TodoDocument>(thread.guildId)
             .deleteOne({ _id: thread.id });
     } finally {
         mongodb.close();

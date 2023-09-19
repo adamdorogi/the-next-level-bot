@@ -1,9 +1,10 @@
 import { Colors, GuildMember } from "discord.js";
 import moment from "moment";
+import config from "../config";
 
 export const onMemberJoin = async (member: GuildMember) => {
-    const guild = await member.client.guilds.fetch(process.env.GUILD_ID!);
-    const memberInfoChannel = await guild.channels.fetch(process.env.MEMBER_INFO_CHANNEL!)
+    const memberInfoChannelId = config.guilds[member.guild.id]?.memberInfoChannel;
+    const memberInfoChannel = await member.guild.channels.fetch(memberInfoChannelId)
 
     if (memberInfoChannel && memberInfoChannel.isTextBased()) {
         memberInfoChannel.send({

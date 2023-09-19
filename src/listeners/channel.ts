@@ -8,7 +8,7 @@ export const onChannelDelete = async (channel: DMChannel | NonThreadGuildBasedCh
         await mongodb.connect();
         await mongodb
             .db(process.env.DB!)
-            .collection<TodoDocument>("todo")
+            .collection<TodoDocument>((channel as NonThreadGuildBasedChannel).guildId)
             .deleteOne({ _id: channel.id });
     } finally {
         mongodb.close();
